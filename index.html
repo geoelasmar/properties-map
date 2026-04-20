@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Newton Acquisitions Map</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.21.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.21.0/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+
+.mapboxgl-popup {
+    max-width: 280px;
+    font: 13px/1.5 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+.popup-content { padding: 4px 2px; }
+.popup-address { font-size: 14px; font-weight: bold; margin-bottom: 6px; }
+.popup-row { display: flex; justify-content: space-between; gap: 16px; color: #444; margin-top: 3px; }
+.popup-label { color: #888; text-transform: uppercase; font-size: 10px; letter-spacing: 0.05em; }
+.popup-value { font-weight: 500; }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiZ2VvZWxhc21hciIsImEiOiJjbW82aWIyaWUyMHh3MnFwejJuMnN0MTMzIn0.IwYxxsEX74A7Ey1xCUo-6w';
+
+    const map = new mapboxgl.Map({
+        container: 'map',
+        center: [-71.170651, 42.333211],
+        style: 'mapbox://styles/geoelasmar/cmni2giup00ax01qog6iwhnhg',
+        zoom: 13.5
+    });
+
+    
+    map.on('load', () => {
+
+    const layers = [
+        'cohassetacquisitionfinal-52vwef',
+        'brightonacquisitionsfinal-38dpwb',
+        'newtonacquisitionsfinal-acj8og',
+        'brooklineacquisitionfinal-1t71bn',
+        'doveracquisitionfinal-6fnjad',
+    ];
+
+    layers.forEach(layerId => {
+
+        map.on('click', layerId, (e) => {
+            const props = e.features[0].properties;
+
+            const html = `
+    <div class="popup-content">
+        <div class="popup-address">${props.address || 'Unknown address'}</div>
+        <div class="popup-row">
+            <div>
+                <div class="popup-label">Year acquired</div>
+                <div class="popup-value">${props.year || 'N/A'}</div>
+            </div>
+            <div>
+                <div class="popup-label">Sale price</div>
+                <div class="popup-value">${props.price || 'N/A'}</div>
+            </div>
+        </div>
+    </div>
+`;
+
+            new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML(html)
+                .addTo(map);
+        });
+
+        map.on('mouseenter', layerId, () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', layerId, () => {
+            map.getCanvas().style.cursor = '';
+        });
+
+    });
+
+});
+</script>
+</body>
+</html>
